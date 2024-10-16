@@ -1,0 +1,7 @@
+pickle
+pandas 
+flask 
+requests
+sklearn
+
+
