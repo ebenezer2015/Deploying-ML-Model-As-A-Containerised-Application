@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, jsonify
 
 def load_model():
     """Loads the best model from the specified pickle file."""
-    with open('best_model.pkl', 'rb') as f:
+    with open('../best_model.pkl', 'rb') as f:
         loaded_model = pickle.load(f)
     return loaded_model
 
