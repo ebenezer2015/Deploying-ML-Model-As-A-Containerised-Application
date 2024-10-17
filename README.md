@@ -1,9 +1,9 @@
 
-Deploying-ML-Model
+## Deploying-ML-Model
 ===========================
 The repo holds the codes required to deploy and infer a machine learning model (built on the iris dataset) using different approaches. Docker and FastAPI
 
-ML model deployment served as an API endpoint using Flask
+#### ML model deployment served as an API endpoint using Flask
 =====================================================================================
 
 Complete code (including a trained model) to deploy and inference a machine learning model (built on the California housing dataset) using Docker and FastAPI.
@@ -22,7 +22,7 @@ Complete code (including a trained model) to deploy and inference a machine lear
 .. code-block::
 
 
-ML model deployment as a Docker Container and served as an AP endpoint using FastAPI
+#### ML model deployment as a Docker Container and served as an AP endpoint using FastAPI
 =====================================================================================
 
 Complete code (including a trained model) to deploy and inference a machine learning model (built on the California housing dataset) using Docker and FastAPI.
