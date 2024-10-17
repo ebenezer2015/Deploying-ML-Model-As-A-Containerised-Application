@@ -1,9 +1,26 @@
 # 1. Library imports
-from fastapi import FastAPI
 import uvicorn
 import pickle
-from base_model_ import FeatureAttributes
 import numpy as np
+import pandas as pd
+from fastapi import FastAPI, HTTPException, Request
+from pydantic import BaseModel
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class FeatureAttributes(BaseModel):
+    longitude: float
+    latitude: float
+    housing_median_age: float
+    total_rooms: float
+    total_bedrooms: float
+    population: float
+    households: float
+    median_income: float
+    ocean_proximity: str
 
 # 2. Create the app object
 def load_model():
@@ -26,42 +43,37 @@ def index():
 #    Located at: http://127.0.0.1:8000/AnyNameHere
 @app.get('/{name}')
 def get_name(name: str):
-    return {'Welcome To Krish Youtube Channel': f'{name}'}
+    return {'Welcome To Median House Price Prediction Task': f'{name}'}
 
 #@app.get('/')
 #def read_root():
  #   return {'message': 'Median House Price model API'}
 
 @app.post('/predict')
-def predict(data:FeatureAttributes):
-    """
-    Predicts the class of a given set of features.
-
-    Args:
-        data (dict): A dictionary containing the features to predict.
-        e.g. {"features": [1, 2, 3, 4]}
-
-    Returns:
-        dict: A dictionary containing the predicted class.
-    """   
-    
-    data = data.dict()
-    
-    df = pd.DataFrame(data, index=[0])
+async def predict(request: Request, data: FeatureAttributes):
+    """Predicts the class of a given set of features."""
+    try:
+        logger.info("Received request: %s", await request.json())
+        data = data.dict()
+        df = pd.DataFrame(data, index=[0])
+        logger.info("Received columns:", df.columns)
         
-    # Preprocess data if needed
-    df = df.dropna(subset=df.columns)
-    # Create dummy variables for the categorical feature
-    df = pd.get_dummies(df, columns=['ocean_proximity'])
+        # Create dummy variables for the categorical feature
+        df = pd.get_dummies(df, columns=['ocean_proximity'])
 
-    # Ensure that the input DataFrame has the same columns as the training data
-    model_columns = loaded_model.feature_names_in_
-    df = df.reindex(columns=model_columns, fill_value=0)
-    
-    # Predict the outcome using the saved model
-    prediction = loaded_model.predict(df)[0]
-    
-    return {'prediction': prediction} 
+        # Ensure the DataFrame has the same columns as the training data
+        model_columns = loaded_model.feature_names_in_
+        df = df.reindex(columns=model_columns, fill_value=0)
+        logger.info("Transformed columns:", df.columns)
+        # Predict the outcome
+        prediction = loaded_model.predict(df)[0]
+        logger.info("Prediction: %s", prediction)
+        return {'prediction': prediction}
+        
+    except Exception as e:
+        logger.error("Error: %s", str(e))
+        # Handle errors
+        raise HTTPException(status_code=400, detail=str(e))
 
 # 5. Run the API with uvicorn
 #    Will run on http://127.0.0.1:8000
